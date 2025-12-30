@@ -33,3 +33,30 @@ export const findSummary = async (date) => {
   const { rows } = await pool.query(query, values);
   return Number(rows[0].count);
 };
+
+export const findSummaryWithHours = async (date) => {
+  const query = `
+    WITH hours AS (
+      SELECT generate_series(0, 23) AS hour
+    )
+    SELECT 
+      h.hour,
+      COALESCE(COUNT(bkl.*), 0) AS count
+    FROM hours h
+    LEFT JOIN baby_kick_log bkl
+      ON EXTRACT(HOUR FROM bkl.created_at) = h.hour
+      AND bkl.created_at >= $1::date
+      AND bkl.created_at < $1::date + INTERVAL '1 day'
+    GROUP BY h.hour
+    ORDER BY h.hour
+  `;
+
+  const values = [date];
+
+  const { rows } = await pool.query(query, values);
+
+  return rows.map((row) => ({
+    hour: Number(row.hour),
+    count: Number(row.count),
+  }));
+};

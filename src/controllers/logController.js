@@ -2,6 +2,7 @@ import {
   insertLog,
   findTodaySummary,
   findSummary,
+  findSummaryWithHours,
 } from "../models/logModel.js";
 
 export const createLog = async (req, res, next) => {
@@ -43,6 +44,30 @@ export const getSummary = async (req, res, next) => {
     const formattedDate = `${year}-${month}-${day}`;
 
     const summary = await findSummary(formattedDate);
+
+    res.status(200).json({
+      success: "Get Summary Success!",
+      data: summary,
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const getSummaryWithHours = async (req, res, next) => {
+  try {
+    const date = req.query;
+
+    if (!date) {
+      return res.status(404).json({ fail: "MISSING DATE" });
+    }
+
+    const raw_date = date.date;
+
+    const [day, month, year] = raw_date.split("/");
+    const formattedDate = `${year}-${month}-${day}`;
+
+    const summary = await findSummaryWithHours(formattedDate);
 
     res.status(200).json({
       success: "Get Summary Success!",
