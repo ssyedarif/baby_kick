@@ -4,6 +4,7 @@ const { Pool } = pkg;
 
 const pool = new Pool({
   connectionString: ENV.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
 });
 
 pool.on("connect", () => {
