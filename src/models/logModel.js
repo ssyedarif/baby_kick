@@ -64,3 +64,18 @@ export const findSummaryWithHours = async (date) => {
     };
   });
 };
+
+export const findLogging = async (date) => {
+  const query = `
+    SELECT *
+    FROM baby_kick_log
+    WHERE created_at >= $1::date
+      AND created_at < $1::date + INTERVAL '1 day'
+  `;
+
+  const values = [date];
+
+  const result = await pool.query(query, values);
+
+  return result.rows;
+};
