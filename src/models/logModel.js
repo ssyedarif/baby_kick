@@ -52,11 +52,15 @@ export const findSummaryWithHours = async (date) => {
   `;
 
   const values = [date];
-
   const { rows } = await pool.query(query, values);
 
-  return rows.map((row) => ({
-    hour: Number(row.hour),
-    count: Number(row.count),
-  }));
+  return rows.map((row) => {
+    const startHour = String(row.hour).padStart(2, "0");
+    const endHour = String((row.hour + 1) % 24).padStart(2, "0");
+
+    return {
+      time: `${startHour}:00 to ${endHour}:00`,
+      count: Number(row.count),
+    };
+  });
 };
